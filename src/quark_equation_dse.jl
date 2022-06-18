@@ -1,3 +1,6 @@
+module quarkdse
+export k, A, B, z2, z4
+using TOML
 using Gaussquad
 using Dierckx
 using JLD2
@@ -6,7 +9,7 @@ using JLD2
 quark-ABkz2z4-$quarkmass-$logofcutoff-$quarkintstep-$repoint.jld2
 =#
 
-dataset=TOML.parsefile(joinpath(workdir, "src", "config.toml"))
+dataset=TOML.parsefile("src/config.toml")
 
 repoint = dataset["quarkDSE"]["repoint"]
 intstep = dataset["quarkDSE"]["quarkintstep"]
@@ -15,7 +18,7 @@ logofcutoff = dataset["quarkDSE"]["logofcutoff"]
 
 # 检测是否有重复的文件
 function testfile()
-    isfile(joinpath(workdir, "data","quark_gap_equation", "quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2"))
+    isfile("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2")
 end
 
 if testfile() == false
@@ -123,9 +126,15 @@ end
 print("循环次数为 $st 次\n")
 AA=Spline1D(k,A)
 BB=Spline1D(k,B)
+print("重整化点的应取值A=", 1, ",","B=$m\n")
+print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
+print("z2=$z2\nz4=$z4\n")
 
-print("重整化点A=", AA(repoint^2), ",","B=",BB(repoint^2))
+jldsave("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
+print("已保存到",joinpath(pwd(),"data/quark_gap_equation\n"))
 else # if for testfile
-    
+print("有现有文件,已读取数据\n")
+A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2","A","B","k", "z2", "z4")
 end #if
 
+end #module

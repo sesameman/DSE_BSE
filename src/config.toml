@@ -35,4 +35,4 @@ z4 = 1.0
 logofcutoff = 4
 quarkintstep = 128
 repoint = 19.0
-quarkmass = 0.003 
+quarkmass = 10000.0033
