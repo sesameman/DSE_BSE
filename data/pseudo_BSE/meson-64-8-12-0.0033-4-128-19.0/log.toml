@@ -39,23 +39,12 @@ quarkmass = 0.0033
 
 [mesonBSE]
 
-kstep = 128
+kstep = 64
 zstep = 8
-Pstep = 15
+Pstep = 12
 test = true
 logofcutoff = 4
 # meson mode document
 # mesonmode = 1 means pseudoscalar meson
 # mesonmode = 1 means scalar meson
 mesonmode = 1 
-
-[readsetting]
-readmode = 1
-kstep = 64
-zstep = 8
-Pstep = 12
-logofcutoffmeson = 4
-logofcutoffquark = 4
-quarkintstep = 128
-repoint = 19.0
-quarkmass = 0.0033
