@@ -40,9 +40,9 @@ quarkmass = 0.0036
 
 kstep = 128
 zstep = 8
-Pstep = 1
+Pstep = 16
 test = true
-logofcutoff = 7
+logofcutoff = 4
 # meson mode document
 # mesonmode = 1 means pseudoscalar meson
 # mesonmode = 1 means scalar meson
@@ -56,8 +56,4 @@ Pstep = 16
 logofcutoff = 4
 quarkintstep = 256
 repoint = 19.0
-quarkmass = 0.0036
-
-[subterm]
-Pstep = 16
-masscutoff = 5
+quarkmass = 0.0035

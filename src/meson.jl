@@ -16,7 +16,6 @@ dataset = TOML.parsefile("src/config.toml")
 quarkrepoint = dataset["quarkDSE"]["repoint"]
 quarkintstep = dataset["quarkDSE"]["quarkintstep"]
 quarkm = dataset["quarkDSE"]["quarkmass"]
-quarklogofcutoff = dataset["quarkDSE"]["logofcutoff"]
 
 # data
 logofcutoff = dataset["mesonBSE"]["logofcutoff"]
@@ -42,7 +41,7 @@ meshz,weightz= gausschebyshev(zstep,2);
 function Inport()
     global z2, z4
     local A, B, k
-    A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint.jld2","A","B","k", "z2", "z4");
+    A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2","A","B","k", "z2", "z4");
     global AA
     global BB
     AA=Spline1D(k,A)
@@ -58,9 +57,9 @@ include(joinpath(pwd(),"src/mesonfile/chebyshevD.jl"))
 
 print("参数导入完毕,开始计算\n")
 if dataset["mesonBSE"]["mesonmode"] == 1
-    if ispath("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint") == false
-        mkdir("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint")
-        cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint/log.toml"))
+    if ispath("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == false
+        mkdir("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint")
+        cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/log.toml"))
         for indexforp2=1:Pstep
             timetest1=time()
             global P2
@@ -72,16 +71,16 @@ if dataset["mesonBSE"]["mesonmode"] == 1
             # 求解函数
             include(joinpath(pwd(),"src/mesonfile/solve_kernel.jl"))
             # 保存文件
-            jldsave("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
+            jldsave("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
             print("$P2 for $indexforp2/$Pstep done, takes",round((time()-timetest1)*100)/100,"s \n")
         end
     else # 
         print("已存在文件")
     end
 elseif dataset["mesonBSE"]["mesonmode"] == 2
-    if ispath("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint") == false
-        mkdir("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint")
-        cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepointl/log.toml"))
+    if ispath("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == false
+        mkdir("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint")
+        cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/log.toml"))
         for indexforp2=1:Pstep
             timetest1=time()
             global P2
@@ -93,7 +92,7 @@ elseif dataset["mesonBSE"]["mesonmode"] == 2
             # 求解函数
             include(joinpath(pwd(),"src/mesonfile/solve_kernel.jl"))
             # 保存文件
-            jldsave("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$quarklogofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
+            jldsave("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
             print("$P2 for $indexforp2/$Pstep done, takes",round((time()-timetest1)*100)/100,"s \n")
         end # for
     else # 

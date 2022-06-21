@@ -14,7 +14,7 @@ dataset=TOML.parsefile("src/config.toml")
 repoint = dataset["quarkDSE"]["repoint"]
 intstep = dataset["quarkDSE"]["quarkintstep"]
 m = dataset["quarkDSE"]["quarkmass"]
-logofcutoff = dataset["quarkDSE"]["logofcutoff"]
+logofcutoff = dataset["mesonBSE"]["logofcutoff"]
 
 # 检测是否有重复的文件
 function testfile()
@@ -93,7 +93,7 @@ jacobifAB(i,j)=-z2^2*w[j]*k[j]*(-2*A[j]*B[j])/(k[j]*A[j]^2+B[j]^2)^2*IntA[i,j]
 jacobifBA(i,j)=-3*z2^2*w[j]*k[j]*(-2*A[j]*B[j]*k[j])/(k[j]*A[j]^2+B[j]^2)^2*IntB[i,j]
 jacobifBB(i,j)=delta(i,j)-3*z2^2*w[j]*k[j]*(k[j]*A[j]^2-B[j]^2)/(k[j]*A[j]^2+B[j]^2)^2*IntB[i,j]
 
-A=fill(1.,intstep);
+A=fill(1.7,intstep);
 B=fill(1.,intstep);
 Δ=fill(1.,2*intstep)
 st=0::Int
@@ -136,5 +136,5 @@ else # if for testfile
 print("有现有文件,已读取数据\n")
 A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2","A","B","k", "z2", "z4")
 end #if
-
-end #module
+M=[B[i]/A[i] for i=1:intstep]
+end #modulez4

@@ -1,15 +1,16 @@
 function Inport()
     global z2, z4
     local A, B, k
-    A, B, k, z2, z4=load("/Users/kjy/Desktop/program/julia/Gamma_23/data/quark_equation/ABkz2z4334.jld2","A","B","k", "z2", "z4");
+    A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2","A","B","k", "z2", "z4");
+    print("确认导入的数据为--", "quark-ABkz2z4-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2\n")
     global AA
     global BB
     AA=Spline1D(k,A)
     BB=Spline1D(k,B)
     return true
 end
-# 导入数据
-Inport();
+Inport()
+
 A1=Array{Float64}(undef,Pstep,kstep,zstep);
 B1=Array{Float64}(undef,Pstep,kstep,zstep);
 A2=Array{Float64}(undef,Pstep,kstep,zstep);
@@ -137,7 +138,7 @@ for i=1:Pstep
         
     end
 end
-f_gamma5P=f_gamma5P *(2*pi)^-3*z4/2*3
+f_gamma5P=f_gamma5P *(2*pi)^-3*z4*3
 f_gamma5muP=f_gamma5muP *(2*pi)^-3*z2/2*3
 f_mo0reP_why=f_mo0reP_why *(2*pi)^-3*z2/2*3
 f_mo0reP=f_mo0reP *(2*pi)^-3*z2/2*3
@@ -145,3 +146,4 @@ f_mo0imP=f_mo0imP *(2*pi)^-3*z2/2*3
 f_mo2reP=f_mo2reP *(2*pi)^-3*z2/2*3*2^2
 f_mo2imP=f_mo2imP *(2*pi)^-3*z2/2*3*2^2
 s_Pi_P=s_Pi_P *(2*pi)^-3*z4/2*3
+print(f_gamma5P)
