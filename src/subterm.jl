@@ -47,8 +47,8 @@ Inport()
 
 constant1 = 1
 constant2 = -2
-bigm1 = dataset["quarkDSE"]["quarkmass"]^2
-bigm2 = dataset["quarkDSE"]["quarkmass"]^2
+bigm1 = dataset["quarkDSE"]["quarkmass"]^2 + 2 * 10^2
+bigm2 = dataset["quarkDSE"]["quarkmass"]^2 + 10^2
 
 psub_form1_pqz=zeros(Pstep,kstep,zstep)
 psub_form1_pq=zeros(Pstep, kstep)
@@ -60,9 +60,16 @@ psub_form2_p=zeros(Pstep)
 
 psub=zeros(Pstep)
 
-# psub_form2_pqz=zeros(Pstep,kstep,zstep)
-# psub_form2_pq=zeros(Pstep, kstep)
-# psub_form2_p=zeros(Pstep)
+ssub_form1_pqz=zeros(Pstep,kstep,zstep)
+ssub_form1_pq=zeros(Pstep, kstep)
+ssub_form1_p=zeros(Pstep)
+
+ssub_form2_pqz=zeros(Pstep,kstep,zstep)
+ssub_form2_pq=zeros(Pstep, kstep)
+ssub_form2_p=zeros(Pstep)
+
+ssub=zeros(Pstep)
+
 
 Threads.@threads for i = 1:Pstep
     for j = 1:kstep
@@ -71,13 +78,17 @@ Threads.@threads for i = 1:Pstep
             P2i = plist[i]
             q2i = meshk[j]
             zq = meshz[m]
-            psub_form1_pqz[i,j,m] = 4*( q2i + bigm1 - P2i/4)/(q2i+P2i+sqrt(q2i*P2i)*zq+bigm1)/(q2i+P2i-sqrt(q2i*P2i)*zq+bigm1)
-            psub_form2_pqz[i,j,m] = 4*( q2i + bigm2 - P2i/4)/(q2i+P2i+sqrt(q2i*P2i)*zq+bigm2)/(q2i+P2i-sqrt(q2i*P2i)*zq+bigm2)
-            # psub_form2_pqz[i,j,m] = 2/q2i+(-2*bigm1-3/2*P2i+sqrt(P2i)*zq)/q2i/q2i
+            psub_form1_pqz[i,j,m] = 4*( q2i + bigm1 - P2i/4)/(q2i+P2i/4+sqrt(q2i*P2i)*zq+bigm1)/(q2i+P2i/4-sqrt(q2i*P2i)*zq+bigm1)
+            psub_form2_pqz[i,j,m] = 4*( q2i + bigm2 - P2i/4)/(q2i+P2i/4+sqrt(q2i*P2i)*zq+bigm2)/(q2i+P2i/4-sqrt(q2i*P2i)*zq+bigm2)
+            # psub_form1_pqz[i,j,m] = ( -((P2i - 4*q2i)*z2^2) + 4*bigm1*z4^2)/((q2i+P2i/4+sqrt(q2i*P2i)*zq)*z2^2+z4^2*bigm1)/((q2i+P2i/4-sqrt(q2i*P2i)*zq)*z2^2+z4^2*bigm1)
+            # psub_form2_pqz[i,j,m] = ( -((P2i - 4*q2i)*z2^2) + 4*bigm2*z4^2)/((q2i+P2i/4+sqrt(q2i*P2i)*zq)*z2^2+z4^2*bigm2)/((q2i+P2i/4-sqrt(q2i*P2i)*zq)*z2^2+z4^2*bigm2)
+            ssub_form1_pqz[i,j,m] = -4*( q2i - bigm1 - P2i/4)/(q2i+P2i+sqrt(q2i*P2i)*zq+bigm1)/(q2i+P2i-sqrt(q2i*P2i)*zq+bigm1)
+            ssub_form2_pqz[i,j,m] = -4*( q2i - bigm2 - P2i/4)/(q2i+P2i+sqrt(q2i*P2i)*zq+bigm2)/(q2i+P2i-sqrt(q2i*P2i)*zq+bigm2)
+
             psub_form1_pq[i,j] += weightz[m]*psub_form1_pqz[i,j,m]
             psub_form2_pq[i,j] += weightz[m]*psub_form2_pqz[i,j,m]
-            # psub_form2_pq[i,j] += weightz[m]*psub_form2_pqz[i,j,m]
-            # f_gammaPq[i,j] += weightz[m]*(P2[i]*A2[i,j,m]*((F1k[i,j,m] + 4*F4k[i,j,m]*q2[j])*A1[i,j,m] - 2*F2k[i,j,m]*B1[i,j,m]) - 2*F2k[i,j,m]*P2[i]*A1[i,j,m]*B2[i,j,m] + 4*sqrt(P2[i]*q2[j])*(F2k[i,j,m] + F3k[i,j,m]*q2[j])*meshz[m]*(A2[i,j,m]*B1[i,j,m] - A1[i,j,m]*B2[i,j,m]) - 2*P2[i]*q2[j]*meshz[m]^2*(2*F4k[i,j,m]*A1[i,j,m]*A2[i,j,m] + F3k[i,j,m]*A2[i,j,m]*B1[i,j,m] + F3k[i,j,m]*A1[i,j,m]*B2[i,j,m]) - 4*F1k[i,j,m]*(q2[j]*A1[i,j,m]*A2[i,j,m] + B1[i,j,m]*B2[i,j,m]))
+            ssub_form1_pq[i,j] += weightz[m]*ssub_form1_pqz[i,j,m]
+            ssub_form2_pq[i,j] += weightz[m]*ssub_form2_pqz[i,j,m]
         end
     end
 end
@@ -88,14 +99,20 @@ for i=1:Pstep
         # i for P2[i], j for q2[j]
         psub_form1_p[i] += weightk[j]*psub_form1_pq[i,j]*meshk[j]
         psub_form2_p[i] += weightk[j]*psub_form2_pq[i,j]*meshk[j]
+        ssub_form1_p[i] += weightk[j]*ssub_form1_pq[i,j]*meshk[j]
+        ssub_form2_p[i] += weightk[j]*ssub_form2_pq[i,j]*meshk[j]
         # psub_form2_p[i]+=weightk[j]*psub_form2_pq[i,j]*meshk[j]
     end
 end
 
-psub_form1_p = psub_form1_p / 8 / pi^3  * z4^2 / z2^2 * constant1 * 3
-psub_form2_p = psub_form2_p / 8 / pi^3  * z4^2 / z2^2 * constant2 * 3
+psub_form1_p = psub_form1_p / (2*pi)^3 * z4^2 / z2^2 * constant1 * 3
+psub_form2_p = psub_form2_p / (2*pi)^3 * z4^2 / z2^2 * constant2 * 3
+
+ssub_form1_p = ssub_form1_p / (2*pi)^3 * z4^2 / z2^2 * constant1 * 3
+ssub_form2_p = ssub_form2_p / (2*pi)^3 * z4^2 / z2^2 * constant2 * 3
 
 psub = psub_form1_p + psub_form2_p
+ssub = ssub_form1_p + ssub_form2_p
 
 print(psub_form1_p,"\n")
 print(psub_form2_p,"\n")

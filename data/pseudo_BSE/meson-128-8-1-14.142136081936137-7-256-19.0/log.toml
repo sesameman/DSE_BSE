@@ -34,10 +34,7 @@ z4 = 1.0
 [quarkDSE]
 quarkintstep = 256
 repoint = 19.0
-# m1^2=m^2+2*100  ->   m1=14.142136081936137   
-# m2^2=m^2+100    ->   m2=10.000000647999979
-
-quarkmass = 0.0036
+quarkmass = 14.142136081936137
 
 [mesonBSE]
 
@@ -45,7 +42,7 @@ kstep = 128
 zstep = 8
 Pstep = 1
 test = true
-logofcutoff = 4
+logofcutoff = 7
 # meson mode document
 # mesonmode = 1 means pseudoscalar meson·
 # mesonmode = 1 means scalar meson
@@ -59,7 +56,7 @@ Pstep = 1
 logofcutoff = 4
 quarkintstep = 256
 repoint = 19.0
-quarkmass = 100.00000006479999
+quarkmass = 0.0036
 
 [subterm]
 Pstep = 1

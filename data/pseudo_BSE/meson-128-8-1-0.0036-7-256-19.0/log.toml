@@ -52,12 +52,12 @@ mesonmode = 1
 readmode = 1
 kstep = 128
 zstep = 8
-Pstep = 16
-logofcutoff = 4
+Pstep = 1
+logofcutoff = 7
 quarkintstep = 256
 repoint = 19.0
 quarkmass = 0.0036
 
 [subterm]
-Pstep = 1
-masscutoff = 4
+Pstep = 16
+masscutoff = 5

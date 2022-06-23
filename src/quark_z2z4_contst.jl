@@ -1,5 +1,12 @@
-module quarkdse
-export k, A, B, z2, z4, M
+# module quarkdse
+# export k, A, B, z2, z4, M
+
+using TOML
+workdir = "/Users/kjy/Desktop/program/julia/DSE_BSE"
+# 放在一个模块儿里运行，与主题函数隔开
+cd(workdir)
+
+
 using TOML
 using Gaussquad
 using Dierckx
@@ -15,10 +22,11 @@ repoint = dataset["quarkDSE"]["repoint"]
 intstep = dataset["quarkDSE"]["quarkintstep"]
 m = dataset["quarkDSE"]["quarkmass"]
 logofcutoff = dataset["mesonBSE"]["logofcutoff"]
- 
+
+m = 14.142136081936137
 # 检测是否有重复的文件
 function testfile()
-    isfile("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2")
+    isfile("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2")
 end
 
 if testfile() == false
@@ -32,8 +40,10 @@ Nf = dataset["data"]["Nf"]
 rm = dataset["data"]["rm"]
 cutup = 10. ^logofcutoff
 cutdown = 10. ^(-logofcutoff)
-z2 = 1.
-z4 = 1.
+# for Λ^2=10^4 m=0.0036
+z2=0.9879792857178762
+z4=0.7815180780204448
+
 A = Array{Float64}(undef,intstep,1)
 B = Array{Float64}(undef,intstep,1)
 # 点与权重
@@ -97,18 +107,14 @@ A=fill(1.7,intstep);
 B=fill(1.2,intstep);
 Δ=fill(1.,2*intstep)
 st=0::Int
-z2old=0.
 # z4old=0.
 
 # k19sumA, k19sumB=repointalpoint()
-while st<500 && (maximum(abs.(Δ))>10^-8 || abs(1- z2/z2old) > 10^-8)
+while st<500 && maximum(abs.(Δ))>10^-8 
 # while st<1
     global A, B, Δ, st, z2, z4, z2old, FA, FB, k19sumB
     st+=1
     k19sumA, k19sumB=renormpoint()
-    z2old=z2
-    z2=(-1+sqrt(1+4*k19sumA))/(2*k19sumA)
-    z4=(m-z2^2*k19sumB)/m
     FA=[FAf(i) for i=1:(intstep)]
     FB=[FBf(i) for i=1:(intstep)]
     jacobiAA=[jacobifAA(i,j) for i=1:(intstep),j=1:(intstep)]
@@ -130,11 +136,11 @@ print("重整化点的应取值A=", 1, ",","B=$m\n")
 print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
 print("z2=$z2\nz4=$z4\n")
 
-# jldsave("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
+jldsave("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
 # print("已保存到",joinpath(pwd(),"data/quark_gap_equation\n"))
 else # if for testfile
 print("有现有文件,已读取数据\n")
-A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2","A","B","k", "z2", "z4")
+A, B, k, z2, z4=load("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2","A","B","k", "z2", "z4")
 AA=Spline1D(k,A)
 BB=Spline1D(k,B)
 print("重整化点的应取值A=", 1, ",","B=$m\n")
@@ -142,4 +148,4 @@ print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
 print("z2=$z2\nz4=$z4\n")
 end #if
 M=[B[i]/A[i] for i=1:intstep]
-end #modulez4
+# end #modulez4
