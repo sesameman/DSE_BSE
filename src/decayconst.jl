@@ -1,15 +1,4 @@
-function Inport()
-    global z2, z4
-    local A, B, k
-    A, B, k, z2, z4=load("data/quark_gap_equation/quark-ABkz2z4-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2","A","B","k", "z2", "z4");
-    print("确认导入的数据为--", "quark-ABkz2z4-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2\n")
-    global AA
-    global BB
-    AA=Spline1D(k,A)
-    BB=Spline1D(k,B)
-    return true
-end
-Inport()
+
 
 A1=Array{Float64}(undef,Pstep,kstep,zstep);
 B1=Array{Float64}(undef,Pstep,kstep,zstep);

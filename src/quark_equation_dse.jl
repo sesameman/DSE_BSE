@@ -8,9 +8,8 @@ using JLD2
 现在定义命名规范
 quark-ABkz2z4-$quarkmass-$logofcutoff-$quarkintstep-$repoint.jld2
 =#
-
+print("----------------quarkdse-------------------\n")
 dataset=TOML.parsefile("src/config.toml")
-
 repoint = dataset["quarkDSE"]["repoint"]
 intstep = dataset["quarkDSE"]["quarkintstep"]
 m = dataset["quarkDSE"]["quarkmass"]

@@ -1,36 +1,38 @@
-# module quarkdse
-# export k, A, B, z2, z4, M
+module quarksub
+export k, A, B, z2, z4, M
 
-using TOML
-workdir = "/Users/kjy/Desktop/program/julia/DSE_BSE"
-# 放在一个模块儿里运行，与主题函数隔开
-cd(workdir)
+# using TOML
+# workdir = "/Users/kjy/Desktop/program/julia/DSE_BSE"
+# # 放在一个模块儿里运行，与主题函数隔开
+# cd(workdir)
 
 
 using TOML
 using Gaussquad
 using Dierckx
 using JLD2
+using Main.quarkdse: z2, z4
 #=
 现在定义命名规范
 quark-ABkz2z4-$quarkmass-$logofcutoff-$quarkintstep-$repoint.jld2
 =#
-
+print("----------------quarksub-------------------\n")
 dataset=TOML.parsefile("src/config.toml")
 
 repoint = dataset["quarkDSE"]["repoint"]
 intstep = dataset["quarkDSE"]["quarkintstep"]
-m = dataset["quarkDSE"]["quarkmass"]
+quarkm = dataset["quarkDSE"]["quarkmass"]
 logofcutoff = dataset["mesonBSE"]["logofcutoff"]
 
-m = 14.142136081936137
+bigm = dataset["subterm"]["bigm"]
+
 # 检测是否有重复的文件
 function testfile()
-    isfile("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2")
+    isfile("data/quark_gap_equation/holdz2z4-$bigm-$quarkm-$logofcutoff-$intstep-$repoint.jld2")
 end
 
 if testfile() == false
-print("文件不存在,正在计算相应quark方程","\n")
+print("文件不存在,正在计算相应于cutoff=10^$logofcutoff--z2=$z2--z4=$z4--的剪除项","\n")
 mt = dataset["data"]["mt"]
 τ = dataset["data"]["tau"]
 Λ = dataset["data"]["lambda"]
@@ -40,9 +42,7 @@ Nf = dataset["data"]["Nf"]
 rm = dataset["data"]["rm"]
 cutup = 10. ^logofcutoff
 cutdown = 10. ^(-logofcutoff)
-# for Λ^2=10^4 m=0.0036
-z2=0.9879792857178762
-z4=0.7815180780204448
+
 
 A = Array{Float64}(undef,intstep,1)
 B = Array{Float64}(undef,intstep,1)
@@ -84,7 +84,7 @@ function FBf(i)
     for j=1:intstep
         sum+=3*k[j]*B[j]/(k[j]*A[j]^2+B[j]^2)*IntB[i,j]*w[j]
     end
-    result=B[i]-z4*m-z2^2*sum
+    result=B[i]-z4*bigm-z2^2*sum
     return result
 end
 
@@ -132,20 +132,24 @@ end
 print("循环次数为 $st 次\n")
 AA=Spline1D(k,A)
 BB=Spline1D(k,B)
-print("重整化点的应取值A=", 1, ",","B=$m\n")
-print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
+print("无穷远点的应取值A=", z2, ",","B=",z4*bigm,"\n")
+print("无穷远点真实值为A=", AA(10^logofcutoff), ",","B=",BB(10^logofcutoff),"\n")
 print("z2=$z2\nz4=$z4\n")
 
-jldsave("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
+jldsave("data/quark_gap_equation/holdz2z4-$bigm-$quarkm-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
 # print("已保存到",joinpath(pwd(),"data/quark_gap_equation\n"))
 else # if for testfile
 print("有现有文件,已读取数据\n")
-A, B, k, z2, z4=load("data/quark_gap_equation/holdz2z4-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2","A","B","k", "z2", "z4")
+A, B, k=load("data/quark_gap_equation/holdz2z4-$bigm-$quarkm-$logofcutoff-$intstep-$repoint.jld2","A","B","k")
 AA=Spline1D(k,A)
 BB=Spline1D(k,B)
-print("重整化点的应取值A=", 1, ",","B=$m\n")
-print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
+print("无穷远点点的理想值A=", z2, ",","B=",z4*bigm,"\n")
+print("无穷远点真实值为A=", AA(10^logofcutoff), ",","B=",BB(10^logofcutoff),"\n")
 print("z2=$z2\nz4=$z4\n")
 end #if
-M=[B[i]/A[i] for i=1:intstep]
-# end #modulez4
+
+
+# M=[B[i]/A[i] for i=1:intstep]
+
+
+end #module

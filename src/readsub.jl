@@ -15,6 +15,7 @@ dataset = TOML.parsefile("src/config.toml")
 quarkrepoint = dataset["readsetting"]["repoint"]
 quarkintstep = dataset["readsetting"]["quarkintstep"]
 quarkm = dataset["readsetting"]["quarkmass"]
+bigm = dataset["readsetting"]["bigm"]
 
 # data
 logofcutoff = dataset["readsetting"]["logofcutoff"]
@@ -48,26 +49,26 @@ mF4k=Array{Float64}(undef,Ppoints,kstep,zstep)
 # F4k=Array{Float64}(undef,Ppoints,kstep)
 kname=Array{String}(undef,Ppoints,1)
 if dataset["readsetting"]["readmode"] == 1
-    if ispath("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == true
-        print("导入--","data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint\n")
+    if ispath("data/pseudo_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == true
+        print("导入--","data/pseudo_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint\n")
         for i=1:Ppoints
             # local a, b
             global P2, F1k, F2k, F3k, F4k
-            P2[i], F1k[i,:,:], F2k[i,:,:], F3k[i,:,:], F4k[i,:,:] =load("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$i-$Pstep.jld2","P2", "F1", "F2", "F3", "F4")
+            P2[i], F1k[i,:,:], F2k[i,:,:], F3k[i,:,:], F4k[i,:,:] =load("data/pseudo_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$i-$Pstep.jld2","P2", "F1", "F2", "F3", "F4")
         end #for i
     else #ispath
-        print("不存在该文件","data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint","\n")
+        print("不存在该文件","data/pseudo_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint","\n")
     end
 elseif dataset["readsetting"]["readmode"] == 2
-    if ispath("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == true
-        print("导入","data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint\n")
+    if ispath("data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == true
+        print("导入","data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint\n")
         for i=1:Ppoints
             # local a, b
             global P2, F1k, F2k, F3k, F4k
             P2[i], F1k[i,:,:], F2k[i,:,:], F3k[i,:,:], F4k[i,:,:] =load("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$i-$Pstep.jld2","P2", "F1", "F2", "F3", "F4")
         end #for i
     else #ispath
-        print("不存在该文件,","data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint","\n")
+        print("不存在该文件,","data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint","\n")
     end
 end # if
 
@@ -87,4 +88,16 @@ for i=1:Pstep
         end
     end
 end
+function Inport()
+    global z2, z4
+    local A, B, k
+    A, B, k, z2, z4=load("data/quark_gap_equation/holdz2z4-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2","A","B","k", "z2", "z4");
+    print("确认导入的数据为--", "holdz2z4-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint.jld2\n")
+    global AA
+    global BB
+    AA=Spline1D(k,A)
+    BB=Spline1D(k,B)
+    return true
+end
+Inport()
 include("decayconst.jl")
