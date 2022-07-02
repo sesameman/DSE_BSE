@@ -2,7 +2,7 @@
 # # 放在一个模块儿里运行，与主题函数隔开
 # cd(workdir)
 
-# module mesonbse
+module mesonbse
 using TOML
 using LinearAlgebra
 using Dierckx
@@ -34,7 +34,10 @@ zstep = dataset["mesonBSE"]["zstep"]
 Pstep = dataset["mesonBSE"]["Pstep"]
 dim = kstep * zstep
 # 取点方式
-plist=[0.001+1/Pstep*(i-1) for i=1:Pstep]
+plist=gausslegendremesh(cutdown,cutup,Pstep,2)[1]
+if Pstep == 1
+    plist = [0.001]
+end 
 meshk,weightk= gausslegendremesh(cutdown,cutup,kstep,2);
 meshz,weightz= gausschebyshev(zstep,2);
 
@@ -73,10 +76,6 @@ if dataset["mesonBSE"]["mesonmode"] == 1
             # 保存文件
             jldsave("data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
             print("mesonBSA--$P2 for $indexforp2/$Pstep done, takes",round((time()-timetest1)*100)/100,"s \n")
-            F1 = nothing
-            F2 = nothing
-            F3 = nothing
-            F4 = nothing
         end
     else # 
         print("已存在文件--",joinpath(pwd(),"data/pseudo_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint"),"\n")
@@ -98,10 +97,6 @@ elseif dataset["mesonBSE"]["mesonmode"] == 2
             # 保存文件
             jldsave("data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/P&F1-4_$indexforp2-$Pstep.jld2";P2, F1, F2, F3, F4)
             print("mesonBSA--$P2 for $indexforp2/$Pstep done, takes",round((time()-timetest1)*100)/100,"s \n")
-            F1 = nothing
-            F2 = nothing
-            F3 = nothing
-            F4 = nothing
         end # for
     else # 
         print("已存在文件--",joinpath(pwd(),"data/scalar_BSE/meson-$kstep-$zstep-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint"),"\n")
@@ -149,7 +144,7 @@ if dataset["subterm"]["calculate"] == 1
     elseif dataset["mesonBSE"]["mesonmode"] == 2
         if ispath("data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint") == false
             mkdir("data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint")
-            cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/scalar_BSE/submeson-$kstep-$zstep-$bigm-$Pstep-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/log.toml"))
+            cp(joinpath(pwd(),"src/config.toml"),joinpath(pwd(),"data/scalar_BSE/submeson-$kstep-$zstep-$Pstep-$bigm-$quarkm-$logofcutoff-$quarkintstep-$quarkrepoint/log.toml"))
             for indexforp2=1:Pstep
                 timetest1=time()
                 global P2
@@ -169,4 +164,4 @@ if dataset["subterm"]["calculate"] == 1
         end # ispath
     end # if for mode
 end # for subterm
-# end # module
+end # module

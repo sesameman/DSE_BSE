@@ -36,14 +36,15 @@ quarkintstep = 256
 repoint = 19.0
 # m1^2=m^2+2*100  ->   m1=14.142136081936137   
 # m2^2=m^2+100    ->   m2=10.000000647999979
-
+# m1^2=m^2+2*10^5  ->   m1=447.21359551444766   
+# m2^2=m^2+100^5   ->   m2=316.2277660373295
 quarkmass = 0.0036
 
 [mesonBSE]
 
-kstep = 128
+kstep = 64
 zstep = 8
-Pstep = 16
+Pstep = 1
 test = true
 logofcutoff = 4
 # meson mode document
@@ -53,17 +54,17 @@ mesonmode = 1
 
 [subterm]
 calculate = 1
-bigm = 10.000000647999979
+bigm = 33
 # Pstep = 1
 # masscutoff = 7
 
 [readsetting]
 readmode = 1
-kstep = 128
+kstep = 64
 zstep = 8
 Pstep = 1
 logofcutoff = 4
 quarkintstep = 256
 repoint = 19.0
 quarkmass = 0.0036
-bigm = 10.000000647999979
+bigm = 13

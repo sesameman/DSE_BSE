@@ -20,6 +20,10 @@ pseudo_vp_pqzq=zeros(Pstep,kstep,zstep)
 pseudo_vp_pq=zeros(Pstep, kstep)
 pseudo_vp_p=zeros(Pstep)
 
+scalar_vp_pqzq=zeros(Pstep,kstep,zstep)
+scalar_vp_pq=zeros(Pstep, kstep)
+scalar_vp_p=zeros(Pstep)
+
 f_gamma5muPqzq=zeros(Pstep,kstep,zstep)
 f_gamma5muPq=zeros(Pstep, kstep)
 f_gamma5muP=zeros(Pstep)
@@ -56,6 +60,9 @@ Threads.@threads for i=1:Pstep
             pseudo_vp_pqzq[i,j,m]=(
                 4*F1*(B1i*B2i + A1i*A2i*q2i) + P2i*(2*A2i*B1i*F2 + 2*A1i*B2i*F2 - A1i*A2i*(F1 + 4*F4*q2i)) - 4*(A2i*B1i - A1i*B2i)*sqrt(P2i*q2i)*(F2 + F3*q2i)*zq + 2*(A2i*B1i*F3 + A1i*B2i*F3 + 2*A1i*A2i*F4)*P2i*q2i*zq^2
                 )*forget_div
+            scalar_vp_pqzq[i,j,m]=(
+                4*B1i*B2i*F1 - 4*(A1i*A2i*F1 + A2i*B1i*F3 + A1i*B2i*F3)*q2i + A1i*A2i*P2i*(F1 + 4*F4*q2i) + 2*(A2i*B1i - A1i*B2i)*F3*sqrt(P2i*q2i)*zq + 2*(A2i*B1i - A1i*B2i)*F2*P2i*sqrt(P2i*q2i)*zq - 4*(A2i*B1i*F2 + A1i*B2i*F2 + A1i*A2i*F4)*P2i*q2i*zq^2
+                )*forget_div
             # pseudo_vp_pqzq[i,j,m]=(
             #     4*F1*(B1i*B2i + A1i*A2i*q2i) + P2i*(A1i*A2i*F1) 
             #     )*forget_div
@@ -65,7 +72,7 @@ Threads.@threads for i=1:Pstep
             f_gamma5muPqzq[i,j,m]=(
                 2*A2i*B1i*F1 + 2*A1i*B2i*F1 - 4*B1i*B2i*F2 + A1i*A2i*F2*P2i + 4*(A1i*A2i*F2 + A2i*B1i*F4 + A1i*B2i*F4)*q2i + (4*(-(A2i*B1i) + A1i*B2i)*F1*q2i*zq)/sqrt(P2i*q2i) + A1i*A2i*F3*P2i*q2i*zq^2 - 4*q2i*(2*A1i*A2i*F2 + B1i*B2i*F3 + A2i*B1i*F4 + A1i*B2i*F4 + A1i*A2i*F3*q2i)*zq^2
                 )*forget_div
-
+            scalar_vp_pq[i,j] += weightz[m]*scalar_vp_pqzq[i,j,m]
             pseudo_vp_pq[i,j] += weightz[m]*pseudo_vp_pqzq[i,j,m]
             f_gamma5Pq[i,j] += weightz[m]*f_gamma5Pqzq[i,j,m]
             f_gamma5muPq[i,j] += weightz[m]* f_gamma5muPqzq[i,j,m]
@@ -77,13 +84,19 @@ end
 
 for i=1:Pstep
     for j=1:kstep
+        scalar_vp_p[i]+=weightk[j]*scalar_vp_pq[i,j]*meshk[j]
         pseudo_vp_p[i]+=weightk[j]*pseudo_vp_pq[i,j]*meshk[j]
         f_gamma5muP[i]+=weightk[j]*f_gamma5muPq[i,j]*meshk[j]
         f_gamma5muP[i]+=weightk[j]*f_gamma5muPq[i,j]*meshk[j]
     end
 end
+scalar_vp_p = scalar_vp_p *(2*pi)^-3*z4*3
 pseudo_vp_p = pseudo_vp_p *(2*pi)^-3*z4*3
 f_gamma5P=f_gamma5P *(2*pi)^-3*z4/2*3
 f_gamma5muP=f_gamma5muP *(2*pi)^-3*z2/2*3
 
-print(pseudo_vp_p)
+if dataset["readsetting"]["readmode"] == 1
+    print("pseudo_vp_p=",pseudo_vp_p,"\n")
+elseif dataset["readsetting"]["readmode"] == 2
+    print("scalar_vp_p=",scalar_vp_p,"\n")
+end 
