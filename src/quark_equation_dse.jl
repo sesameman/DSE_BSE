@@ -30,9 +30,27 @@ dd = dataset["data"]["dd"]
 Nf = dataset["data"]["Nf"]
 rm = dataset["data"]["rm"]
 cutup = 10. ^logofcutoff
-cutdown = 10. ^(-logofcutoff)
-z2 = 1.
-z4 = 1.
+cutdown = 10. ^(-4)
+z2 = dataset["data"]["z2"]
+z4 = dataset["data"]["z4"]
+# just work
+if logofcutoff == 4
+    z2=0.9879792857178762
+    z4=0.7815180780204448
+elseif logofcutoff == 5
+    z2=0.9845440956492209
+    z4=0.7180420041779199
+elseif logofcutoff == 6
+    z2=0.9827094880372973
+    z4=0.66925783420027
+elseif logofcutoff == 7
+    z2=0.980895941807319
+    z4=0.6438571674050129
+elseif logofcutoff == 8
+    z2=0.978616111990675
+    z4=0.6064193919612297
+end
+
 A = Array{Float64}(undef,intstep,1)
 B = Array{Float64}(undef,intstep,1)
 # 点与权重
@@ -106,8 +124,10 @@ while st<500 && (maximum(abs.(Δ))>10^-8 || abs(1- z2/z2old) > 10^-8)
     st+=1
     k19sumA, k19sumB=renormpoint()
     z2old=z2
-    z2=(-1+sqrt(1+4*k19sumA))/(2*k19sumA)
-    z4=(m-z2^2*k19sumB)/m
+    if m != 0
+        z2=(-1+sqrt(1+4*k19sumA))/(2*k19sumA)
+        z4=(m-z2^2*k19sumB)/m
+    end
     FA=[FAf(i) for i=1:(intstep)]
     FB=[FBf(i) for i=1:(intstep)]
     jacobiAA=[jacobifAA(i,j) for i=1:(intstep),j=1:(intstep)]
@@ -129,7 +149,7 @@ print("重整化点的应取值A=", 1, ",","B=$m\n")
 print("重整化点真实值为A=", AA(repoint^2), ",","B=",BB(repoint^2),"\n")
 print("z2=$z2\nz4=$z4\n")
 
-# jldsave("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
+jldsave("data/quark_gap_equation/quark-ABkz2z4-$m-$logofcutoff-$intstep-$repoint.jld2";A, B, k, z2, z4)
 # print("已保存到",joinpath(pwd(),"data/quark_gap_equation\n"))
 else # if for testfile
 print("有现有文件,已读取数据\n")
